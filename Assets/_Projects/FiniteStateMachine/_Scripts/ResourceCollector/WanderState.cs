@@ -1,44 +1,46 @@
+using System;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace AIGAME.FSM
 {
-    [System.Serializable]
-    public class WanderState : State
+    [Serializable]
+    public class WanderState : PatrolState
     {
         [field: SerializeField] public float Range { get; private set; }
         [SerializeField] private float _moveSpeed = 5f;
         [SerializeField] private float _moveInterval = 1f;
         [SerializeField] private float _distanceThreshold = 0.3f;
-        private Vector2 _targetPosition;
-        private Vector2 _moveDirection;
-        private CollectorStateController _controller;
         private float _elapsedTime;
         private bool _isFacingLeft;
+        private Vector2 _moveDirection;
+        private Vector2 _targetPosition;
+
         protected override void OnStateEnter()
         {
             base.OnStateEnter();
-            _controller = StateController as CollectorStateController;
-            _targetPosition = _controller.Collector.Position + Random.insideUnitSphere * Range;
+            _targetPosition = Controller.Collector.Position + Random.insideUnitSphere * Range;
         }
+
+        protected override void OnStateExit()
+        {
+            base.OnStateExit();
+            Controller.Collector.Animator.SetBool("isMoving", false);
+        }
+
         protected override void OnStateUpdate()
         {
             base.OnStateUpdate();
 
-            _controller.Collector.Animator.SetBool("isMoving", _moveDirection != Vector2.zero);
-
-            _moveDirection = (_targetPosition - (Vector2)_controller.Collector.Position).normalized;
+            _moveDirection = (_targetPosition - (Vector2)Controller.Collector.Position).normalized;
 
             if (_moveDirection.x < 0)
-            {
                 _isFacingLeft = true;
-            }
-            else if (_moveDirection.x > 0)
-            {
-                _isFacingLeft = false;
-            }
-            _controller.Collector.SpriteRenderer.flipX = _isFacingLeft;
+            else if (_moveDirection.x > 0) _isFacingLeft = false;
 
-            if (Vector2.Distance(_controller.Collector.Position, _targetPosition) < _distanceThreshold)
+            Controller.Collector.SpriteRenderer.flipX = _isFacingLeft;
+
+            if (Vector2.Distance(Controller.Collector.Position, _targetPosition) < _distanceThreshold)
             {
                 if (_elapsedTime < _moveInterval)
                 {
@@ -48,19 +50,25 @@ namespace AIGAME.FSM
                 else
                 {
                     _elapsedTime = 0f;
-                    _targetPosition = _controller.Collector.Position + Random.insideUnitSphere * Range;
+                    _targetPosition = Controller.Collector.Position + Random.insideUnitSphere * Range;
                 }
+
+                Controller.Collector.Animator.SetBool("isMoving", false);
+            }
+            else
+            {
+                Controller.Collector.Animator.SetBool("isMoving", true);
             }
 
-            if (Physics2D.OverlapCircle(_controller.Collector.Position, _controller.Seek.Range, _controller.Seek.VisibleLayer))
-            {
-                _controller.ChangeState(_controller.Seek);
-            }
+            if (Physics2D.OverlapCircle(Controller.Collector.Position, Controller.Seek.Range,
+                    Controller.Seek.VisibleLayer)) Controller.ChangeState(Controller.Seek);
         }
+
         protected override void OnPhysicsUpdate()
         {
             base.OnPhysicsUpdate();
-            _controller.Collector.Rigidbody.MovePosition((Vector2)_controller.Collector.Position + _moveDirection * _moveSpeed * Time.fixedDeltaTime);
+            Controller.Collector.Rigidbody.MovePosition((Vector2)Controller.Collector.Position +
+                                                        _moveDirection * (_moveSpeed * Time.fixedDeltaTime));
         }
     }
 }
