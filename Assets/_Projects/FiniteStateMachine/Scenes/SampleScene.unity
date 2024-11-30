@@ -2450,6 +2450,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2851153931536596581, guid: 4679935fb4181b0479bc5909adb88f21, type: 3}
+      propertyPath: <Alert>k__BackingField.<Range>k__BackingField
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2851153931536596581, guid: 4679935fb4181b0479bc5909adb88f21, type: 3}
       propertyPath: <Alert>k__BackingField.<DangerLayer>k__BackingField.m_Bits
       value: 128
       objectReference: {fileID: 0}
