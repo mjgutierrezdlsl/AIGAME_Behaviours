@@ -58,6 +58,7 @@ namespace AIGAME.FSM
             else
             {
                 Controller.Collector.Animator.SetBool("isMoving", true);
+                    Debug.DrawLine(Controller.Collector.Position, _targetPosition,Color.green);
             }
 
             if (Physics2D.OverlapCircle(Controller.Collector.Position, Controller.Seek.Range,

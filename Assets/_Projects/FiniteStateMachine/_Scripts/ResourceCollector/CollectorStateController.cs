@@ -33,8 +33,6 @@ namespace AIGAME.FSM
 
         private void OnDrawGizmos()
         {
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireSphere(transform.position, Wander.Range);
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(transform.position, Seek.Range);
             Gizmos.color = Color.red;
